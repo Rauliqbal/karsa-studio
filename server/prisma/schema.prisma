@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  verified  Boolean  @default(false)
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  superadmin
+  admin
+  member
+}
+
+model Company {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  foundedYear Int
+  address     String
+  email       String
+  phone       String
+
+  teamMembers TeamMember[]
+}
+
+model CompanyProfile {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  foundedYear   Int
+  address       String
+  email         String
+  phone         String
+  vision        String
+  mission       String
+  logoUrl       String
+  coverImageUrl String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Service {
+  id          String @id @default(uuid())
+  title       String
+  description String
+  iconUrl     String
+
+  contactMessages ContactMessage[]
+}
+
+model TeamMember {
+  id        String  @id @default(uuid())
+  name      String
+  position  String
+  photoUrl  String
+  bio       String
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  blogPosts BlogPost[]
+}
+
+model BlogPost {
+  id          String     @id @default(uuid())
+  title       String
+  content     String
+  coverImage  String
+  publishedAt DateTime
+  authorId    String
+  author      TeamMember @relation(fields: [authorId], references: [id])
+}
+
+model Testimonial {
+  id         String     @id @default(uuid())
+  clientName String
+  title      String
+  company    String
+  message    String
+  photoUrl   String
+  projectId  String?
+  project    Portfolio? @relation(fields: [projectId], references: [id])
+}
+
+model JobVacancy {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  location    String
+  postedAt    DateTime
+
+  applications JobApplication[]
+}
+
+model JobApplication {
+  id          String     @id @default(uuid())
+  jobId       String
+  job         JobVacancy @relation(fields: [jobId], references: [id])
+  name        String
+  email       String
+  cvUrl       String
+  coverLetter String
+}
+
+model Portfolio {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  imageUrl    String
+  projectUrl  String
+  completedAt DateTime
+
+  testimonials Testimonial[]
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  sentAt    DateTime
+  serviceId String?
+  service   Service? @relation(fields: [serviceId], references: [id])
+}

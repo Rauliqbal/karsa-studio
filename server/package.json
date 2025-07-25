@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.17.1",
+    "@prisma/client": "^6.12.0",
+    "hono": "^4.8.5",
+    "zod": "^4.0.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "@types/nodemailer": "^6.4.17",
+    "nodemailer": "^7.0.5",
+    "prisma": "^6.12.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3"
+  }
+}
