@@ -1,9 +1,10 @@
 import { prisma } from "../utils/db.js"
 import bcrypt from "bcryptjs"
 import { signToken } from "../utils/jwt.js"
+import type { Context } from "hono"
 
 // REGISTER
-export const register = async (c:any) => {
+export const register = async (c:Context) => {
   const data = c.get('validatedData')
  
   const existing = await prisma.adminUser.findUnique({
@@ -47,7 +48,7 @@ export const register = async (c:any) => {
 
 
 // LOGIN
-export const login = async (c:any) => {
+export const login = async (c:Context) => {
   const data = c.get('validatedData')
 
   const user = await prisma.adminUser.findUnique({
@@ -77,10 +78,30 @@ export const login = async (c:any) => {
     role: user.role
   })
 
+  const {password, verified,...admin} = user
+
   return c.json({
     success: true,
     message: "User logged in successfully",
-    data: token,
+    data: {
+      admin,
+      token
+    },
   }, 200)
   
+}
+
+// ADMINUSER
+export const getAdmin = async(c:Context) => {
+  const user = c.get('user') as {id :string}
+
+  const admin = await prisma.adminUser.findUnique({
+    where: {id: user.id}
+  })
+
+  if(!admin) {
+    return c.json({
+      error: "User not found"
+    },404)
+  }
 }
