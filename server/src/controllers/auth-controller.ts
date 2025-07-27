@@ -1,0 +1,86 @@
+import { prisma } from "../utils/db.js"
+import bcrypt from "bcryptjs"
+import { signToken } from "../utils/jwt.js"
+
+// REGISTER
+export const register = async (c:any) => {
+  const data = c.get('validatedData')
+ 
+  const existing = await prisma.adminUser.findUnique({
+    where: {
+      email: data.email
+    }
+  })
+
+  if (existing) {
+    return c.json({
+      success: false,
+      message: "User already exists",
+    }, 400)
+  }
+
+  const hashed = await bcrypt.hash(data.password, 10)
+
+  const user = await prisma.adminUser.create({
+    data: {
+      name: data.name,
+      email: data.email,
+      password: hashed,
+      role: data.role,
+      verified: false
+    }
+  })
+
+  const register = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  }
+
+  return c.json({
+    success: true,
+    message: "User created successfully",
+    data: register,
+  }, 200)
+}
+
+
+// LOGIN
+export const login = async (c:any) => {
+  const data = c.get('validatedData')
+
+  const user = await prisma.adminUser.findUnique({
+    where: {
+      email: data.email
+    }
+  })
+
+  if(!user){
+    return c.json({
+      success: false,
+      message: "User not found",
+    }, 401)
+  }
+
+  const valid = await bcrypt.compare(data.password, user.password)
+  if(!valid){
+    return c.json({
+      success: false,
+      message: "Invalid password",
+    }, 401)
+  }
+
+  const token = signToken({
+    id: user.id,
+    email: user.email,
+    role: user.role
+  })
+
+  return c.json({
+    success: true,
+    message: "User logged in successfully",
+    data: token,
+  }, 200)
+  
+}
