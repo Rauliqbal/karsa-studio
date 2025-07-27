@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import authRoutes from './routes/auth-route.js'
+import authService from './routes/service-route.js'
 
 const app = new Hono()
 
@@ -13,6 +14,7 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 app.route('/auth', authRoutes)
+app.route('/api', authService)
 
 serve({
   fetch: app.fetch,
