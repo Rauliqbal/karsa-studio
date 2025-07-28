@@ -95,13 +95,20 @@ export const login = async (c:Context) => {
 export const getAdmin = async(c:Context) => {
   const user = c.get('user') as {id :string}
 
-  const admin = await prisma.adminUser.findUnique({
+  const adminUser = await prisma.adminUser.findUnique({
     where: {id: user.id}
   })
 
-  if(!admin) {
+  if(!adminUser) {
     return c.json({
       error: "User not found"
     },404)
   }
+
+  const {password, verified,...admin} = adminUser
+
+  return c.json({
+    success: true,
+    data: admin
+  })
 }

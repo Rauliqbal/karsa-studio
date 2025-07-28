@@ -8,10 +8,10 @@ export const authorization:MiddlewareHandler = async (c:Context, next) => {
     return c.json({error: 'Unauthorized'}, 401)
   }
 
-  const token = header.split(' ')[0]
+  const token = header.split(' ')[1]
 
   try {
-    const decoded = await verifyToken(token)
+    const decoded =  verifyToken(token)
     c.set('user', decoded)
     await next()
   } catch (error) {
