@@ -46,6 +46,24 @@ export const getServices = async (c: Context) => {
   const services = await prisma.service.findMany()
   return c.json({
     success: true,
+    message: "Get services successfully",
     data: services
+  })
+}
+
+// READ BY ID 
+export const getServiceDetail = async (c: Context) => {
+  const id = c.req.param('id')
+
+  const service = await prisma.service.findUnique({
+    where: {
+      id
+    }
+  })
+
+  return c.json({
+    success: true,
+    message: "Get detail service successfully",
+    data: service
   })
 }
