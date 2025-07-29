@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { createService } from "../controllers/service-controller.js";
+import { createService, getServices } from "../controllers/service-controller.js";
 import { authorization } from "../middlewares/authorization.js";
-import { validate } from "../middlewares/validate.js";
-import { serviceSchema } from "../schemas/serviceSchema.js";
+
 
 
 const app = new Hono
 
-app.post('/service',authorization,validate(serviceSchema),createService)
+app.post('/service',authorization,createService)
+app.get('/service', authorization, getServices)
 
 
 export default app

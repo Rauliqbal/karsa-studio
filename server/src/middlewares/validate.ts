@@ -3,7 +3,7 @@ import type { ZodSchema } from "zod";
 
 export const validate = (schema: ZodSchema): MiddlewareHandler => {
   return async (c,next) => {
-    const body = await c.req.json()
+    const body = await c.req.parseBody()
     const parsed = schema.safeParse(body)
 
     if (!parsed.success) {

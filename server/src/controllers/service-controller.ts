@@ -4,33 +4,32 @@ import fs from "fs/promises"
 import type { Context } from "hono"
 import { prisma } from "../utils/db.js"
 
+// CREATE
 export const createService = async (c: Context) => {
-  const data = c.get("validatedData") as {
-    title: string
-    description: string
-  }
+  const body = await c.req.parseBody()
+  const iconFile = body.iconUrl as File
+  const title = body.title as string
+  const description = body.description as string
 
-  const iconFile = c.get("file") as File
-
-  if (!iconFile) {
+  if (!iconFile || !(iconFile instanceof File)) {
     return c.json({
       success: false,
-      message: "Invalid icon file"
+      message: "Icon file is required",
     }, 400)
   }
 
   const ext = path.extname(iconFile.name)
   const filename = `icon-${uuidv4()}${ext}`
-  const uploadDir = './public/uploads'
-  const filepath = path.join(uploadDir, filename)
-
+  const uploadDir = './public/uploads/'
+    const filepath = path.join(uploadDir, filename)
+    
   const buffer = await iconFile.arrayBuffer()
   await fs.writeFile(filepath, Buffer.from(buffer))
 
   const service = await prisma.service.create({
     data: {
-      title: data.title,
-      description: data.description,
+      title,
+      description,
       iconUrl: `/uploads/${filename}`
     }
   })
@@ -39,5 +38,14 @@ export const createService = async (c: Context) => {
     success: true,
     message: "Service created successfully",
     data: service
+  })
+}
+
+// READ
+export const getServices = async (c: Context) => {
+  const services = await prisma.service.findMany()
+  return c.json({
+    success: true,
+    data: services
   })
 }
