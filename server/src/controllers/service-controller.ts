@@ -67,3 +67,45 @@ export const getServiceDetail = async (c: Context) => {
     data: service
   })
 }
+
+// UPDATE 
+export const updateService = async (c: Context) => {
+  const id = c.req.param('id')
+
+  const body = await c.req.parseBody()
+  const iconFile = body.iconUrl as File
+  const title = body.title as string
+  const description = body.description as string
+
+  if (!iconFile || !(iconFile instanceof File)) {
+    return c.json({
+      success: false,
+      message: "Icon file is required",
+    }, 400)
+  }
+
+  const ext = path.extname(iconFile.name)
+  const filename = `icon-${uuidv4()}${ext}`
+  const uploadDir = './public/uploads/'
+    const filepath = path.join(uploadDir, filename)
+    
+  const buffer = await iconFile.arrayBuffer()
+  await fs.writeFile(filepath, Buffer.from(buffer))
+
+  const service = await prisma.service.update({
+    where: {
+      id
+    },
+    data: {
+      title,
+      description,
+      iconUrl: `/uploads/${filename}`
+    }
+  })
+
+  return c.json({
+    success: true,
+    message: "Service updated successfully",
+    data: service
+  })
+}
