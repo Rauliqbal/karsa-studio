@@ -1,111 +1,148 @@
-import path from "path"
-import { v4 as uuidv4 } from "uuid"
-import fs from "fs/promises"
-import type { Context } from "hono"
-import { prisma } from "../utils/db.js"
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import fs from "fs/promises";
+import type { Context } from "hono";
+import { prisma } from "../utils/db.js";
 
 // CREATE
 export const createService = async (c: Context) => {
-  const body = await c.req.parseBody()
-  const iconFile = body.iconUrl as File
-  const title = body.title as string
-  const description = body.description as string
+  const body = await c.req.parseBody();
+  const iconFile = body.iconUrl as File;
+  const title = body.title as string;
+  const description = body.description as string;
 
   if (!iconFile || !(iconFile instanceof File)) {
-    return c.json({
-      success: false,
-      message: "Icon file is required",
-    }, 400)
+    return c.json(
+      {
+        success: false,
+        message: "Icon file is required",
+      },
+      400
+    );
   }
 
-  const ext = path.extname(iconFile.name)
-  const filename = `icon-${uuidv4()}${ext}`
-  const uploadDir = './public/uploads/'
-    const filepath = path.join(uploadDir, filename)
-    
-  const buffer = await iconFile.arrayBuffer()
-  await fs.writeFile(filepath, Buffer.from(buffer))
+  const ext = path.extname(iconFile.name);
+  const filename = `icon-${uuidv4()}${ext}`;
+  const uploadDir = "./public/uploads/";
+  const filepath = path.join(uploadDir, filename);
+
+  const buffer = await iconFile.arrayBuffer();
+  await fs.writeFile(filepath, Buffer.from(buffer));
 
   const service = await prisma.service.create({
     data: {
       title,
       description,
-      iconUrl: `/uploads/${filename}`
-    }
-  })
+      iconUrl: `/uploads/${filename}`,
+    },
+  });
 
   return c.json({
     success: true,
     message: "Service created successfully",
-    data: service
-  })
-}
+    data: service,
+  });
+};
 
 // READ
 export const getServices = async (c: Context) => {
-  const services = await prisma.service.findMany()
+  const services = await prisma.service.findMany();
   return c.json({
     success: true,
     message: "Get services successfully",
-    data: services
-  })
-}
+    data: services,
+  });
+};
 
-// READ BY ID 
+// READ BY ID
 export const getServiceDetail = async (c: Context) => {
-  const id = c.req.param('id')
+  const id = c.req.param("id");
 
   const service = await prisma.service.findUnique({
     where: {
-      id
-    }
-  })
+      id,
+    },
+  });
 
   return c.json({
     success: true,
     message: "Get detail service successfully",
-    data: service
-  })
-}
+    data: service,
+  });
+};
 
-// UPDATE 
+// UPDATE
 export const updateService = async (c: Context) => {
-  const id = c.req.param('id')
+  const id = c.req.param("id");
 
-  const body = await c.req.parseBody()
-  const iconFile = body.iconUrl as File
-  const title = body.title as string
-  const description = body.description as string
+  const body = await c.req.parseBody();
+  const iconFile = body.iconUrl as File;
+  const title = body.title as string;
+  const description = body.description as string;
 
   if (!iconFile || !(iconFile instanceof File)) {
-    return c.json({
-      success: false,
-      message: "Icon file is required",
-    }, 400)
+    return c.json(
+      {
+        success: false,
+        message: "Icon file is required",
+      },
+      400
+    );
   }
 
-  const ext = path.extname(iconFile.name)
-  const filename = `icon-${uuidv4()}${ext}`
-  const uploadDir = './public/uploads/'
-    const filepath = path.join(uploadDir, filename)
-    
-  const buffer = await iconFile.arrayBuffer()
-  await fs.writeFile(filepath, Buffer.from(buffer))
+  const ext = path.extname(iconFile.name);
+  const filename = `icon-${uuidv4()}${ext}`;
+  const uploadDir = "./public/uploads/";
+  const filepath = path.join(uploadDir, filename);
+
+  const buffer = await iconFile.arrayBuffer();
+  await fs.writeFile(filepath, Buffer.from(buffer));
 
   const service = await prisma.service.update({
     where: {
-      id
+      id,
     },
     data: {
       title,
       description,
-      iconUrl: `/uploads/${filename}`
-    }
-  })
+      iconUrl: `/uploads/${filename}`,
+    },
+  });
 
   return c.json({
     success: true,
     message: "Service updated successfully",
-    data: service
-  })
-}
+    data: service,
+  });
+};
+
+// DELETE
+export const deleteService = async (c: Context) => {
+  const id = c.req.param("id");
+
+  const cekService = await prisma.service.findUnique({
+    where: {
+      id,
+    },
+  });
+  if (!cekService)
+    return c.json(
+      {
+        success: false,
+        message: "Service not found",
+      },
+      404
+    );
+
+  const service = await prisma.service.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  return c.json({
+    success: true,
+    message: "Service deleted successfully",
+    data: service,
+  });
+};
