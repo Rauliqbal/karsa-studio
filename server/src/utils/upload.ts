@@ -1,13 +1,20 @@
 import { writeFile } from "fs/promises";
+import fs from "fs";
 import path from "path";
 
-export async function saveFile(file: File, folder = "public/uploads") {
+export async function saveFile(file: File, filename?: string): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer());
-  const fileName = `${Date.now()}-${file.name}`;
-  const filePath = path.join(process.cwd(), folder, fileName);
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-  await writeFile(filePath, buffer);
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
 
-  // return relative url
+  const fileName = filename || `${Date.now()}-${file.name}`;
+  const filePath = path.join(uploadDir, fileName);
+
+  await fs.promises.writeFile(filePath, buffer);
+
+  // return URL
   return `/uploads/${fileName}`;
 }

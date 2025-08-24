@@ -105,39 +105,30 @@ export const login = async (c: any) => {
 
 // GET CURRENT USER
 export const getUser = async (c: any) => {
-  try {
-    const authHeader = c.req.header("authorization");
-    if (!authHeader) {
-      return c.json({ success: false, message: "No token provided" }, 401);
-    }
+  const auth = c.get("auth");
 
-    const token = authHeader.split(" ")[1]; // "Bearer <token>"
-    const decoded: any = verifyToken(token);
-
-    const user = await prisma.adminUser.findUnique({
-      where: { id: decoded.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        verified: true,
-      },
-    });
-
-    if (!user) {
-      return c.json({ success: false, message: "User not found" }, 404);
-    }
-
-    return c.json(
-      {
-        success: true,
-        message: "User fetched successfully",
-        data: user,
-      },
-      200
-    );
-  } catch (err) {
-    return c.json({ success: false, message: "Invalid or expired token" }, 401);
+  if (!auth?.id) {
+    return c.json({ success: false, message: "Unauthorized" }, 401);
   }
+
+  const user = await prisma.adminUser.findUnique({
+    where: { id: auth.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      verified: true,
+    },
+  });
+
+  if (!user) {
+    return c.json({ success: false, message: "User not found" }, 404);
+  }
+
+  return c.json({
+    success: true,
+    message: "User fetched successfully",
+    data: user,
+  });
 };
