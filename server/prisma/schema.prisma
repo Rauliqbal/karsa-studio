@@ -47,18 +47,6 @@ model CompanyProfile {
   updatedAt     DateTime @updatedAt
 }
 
-model Company {
-  id          String @id @default(uuid())
-  name        String
-  description String
-  foundedYear Int
-  address     String
-  email       String
-  phone       String
-
-  teamMembers TeamMember[]
-}
-
 model Service {
   id          String @id @default(uuid())
   title       String
@@ -69,25 +57,24 @@ model Service {
 }
 
 model TeamMember {
-  id        String  @id @default(uuid())
-  name      String
-  position  String
-  photoUrl  String
-  bio       String
-  companyId String
-  company   Company @relation(fields: [companyId], references: [id])
+  id       String @id @default(uuid())
+  name     String
+  position String
+  photoUrl String
+  bio      String
 
   blogPosts BlogPost[]
 }
 
 model BlogPost {
-  id          String     @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   content     String
   coverImage  String
-  publishedAt DateTime
-  authorId    String
-  author      TeamMember @relation(fields: [authorId], references: [id])
+  publishedAt DateTime?
+
+  authorId String
+  author   TeamMember? @relation(fields: [authorId], references: [id])
 }
 
 model Testimonial {

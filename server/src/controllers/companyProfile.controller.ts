@@ -7,7 +7,6 @@ import type {
 } from "../types/companyProfile.js";
 import path from "path";
 import fs from "fs/promises";
-import { success } from "zod";
 
 // Create Company Profile
 export const createCompanyProfile = async (c: Context) => {
@@ -125,7 +124,30 @@ export const deleteCompanyProfile = async (c: Context) => {
   const profile = await prisma.companyProfile.findFirst();
   if (!profile) return c.json({ message: "Not Found" }, 404);
 
+  if (profile.logoUrl) {
+    const logoFile = path.basename(profile.logoUrl);
+    const logoPath = path.join(process.cwd(), "public", "uploads", logoFile);
+    try {
+      await fs.unlink(logoPath);
+      console.log("Deleted logo:", logoPath);
+    } catch (err) {
+      console.warn("Logo file not found:", logoPath);
+    }
+  }
+
+  if (profile.coverImageUrl) {
+    const coverFile = path.basename(profile.coverImageUrl);
+    const coverPath = path.join(process.cwd(), "public", "uploads", coverFile);
+    try {
+      await fs.unlink(coverPath);
+      console.log("Deleted cover image:", coverPath);
+    } catch (err) {
+      console.warn("Cover image file not found:", coverPath);
+    }
+  }
+
   await prisma.companyProfile.delete({ where: { id: profile.id } });
+
   return c.json({
     success: true,
     message: "Delete Successfully",
