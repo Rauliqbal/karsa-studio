@@ -8,7 +8,12 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  modules: ["@nuxt/icon", "@nuxt/fonts", "shadcn-nuxt"],
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_API_BASE,
+    },
+  },
+  modules: ["@pinia/nuxt", "@nuxt/icon", "@nuxt/fonts", "shadcn-nuxt"],
   shadcn: {
     prefix: "",
     /**

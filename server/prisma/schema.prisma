@@ -20,7 +20,7 @@ model AdminUser {
   email     String   @unique
   verified  Boolean  @default(false)
   password  String
-  role      Role
+  role      Role     @default(member)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
