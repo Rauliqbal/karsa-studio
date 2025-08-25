@@ -51,6 +51,7 @@ const handleRegister = async () => {
 
 definePageMeta({
   layout: false,
+  middleware: "auth-redirect",
 });
 
 useHead({

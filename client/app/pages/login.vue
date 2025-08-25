@@ -35,7 +35,7 @@ const handleLogin = async () => {
     });
 
     resetField();
-    Cookies.set("karsa_token", res.data.token);
+    Cookies.set("karsa_token", res.data.token, { expires: 1 });
     console.log(res.data);
     router.push("/dashboard");
     toast("Login Successfully!");
@@ -49,6 +49,7 @@ const handleLogin = async () => {
 
 definePageMeta({
   layout: false,
+  middleware: "auth-redirect",
 });
 
 useHead({
