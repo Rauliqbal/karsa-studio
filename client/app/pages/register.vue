@@ -43,7 +43,7 @@ const handleRegister = async () => {
     toast("Registered Successfully!");
   } catch (error) {
     console.error(error);
-    resetField();
+    toast("Register Failed!");
   } finally {
     isLoading.value = false;
   }
@@ -112,7 +112,9 @@ useHead({
           />
         </div>
 
-        <Button class="w-full mt-6" type="submit">Register</Button>
+        <Button class="w-full mt-6" type="submit" :disabled="isLoading"
+          >Register</Button
+        >
 
         <p class="text-gray-500 mt-6">
           Already have an account?
