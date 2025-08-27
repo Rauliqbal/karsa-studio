@@ -48,12 +48,12 @@ model CompanyProfile {
 }
 
 model Service {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   description String
-  iconUrl     String
-
-  contactMessages ContactMessage[]
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
 }
 
 model TeamMember {
@@ -120,12 +120,10 @@ model Portfolio {
 }
 
 model ContactMessage {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  subject   String
-  message   String
-  sentAt    DateTime
-  serviceId String?
-  service   Service? @relation(fields: [serviceId], references: [id])
+  id      String   @id @default(uuid())
+  name    String
+  email   String
+  subject String
+  message String
+  sentAt  DateTime
 }

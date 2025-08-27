@@ -45,7 +45,7 @@ export const createCompanyProfile = async (c: Context) => {
     {
       success: true,
       message: "Create successfully",
-      data,
+      data: profile,
     },
     201
   );
