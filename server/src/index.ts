@@ -31,6 +31,29 @@ app.get("/", (c) => {
 app.route("/auth", authRoutes);
 app.route("/api", apiRoute);
 
+// Error Handling
+app.onError((err, c) => {
+  console.error("🔥 Error:", err);
+
+  return c.json(
+    {
+      success: false,
+      message: err.message || "Internal Server Error",
+    },
+    500
+  );
+});
+
+app.notFound((c) => {
+  return c.json(
+    {
+      success: false,
+      message: "Route Not Found",
+    },
+    404
+  );
+});
+
 serve(
   {
     fetch: app.fetch,
