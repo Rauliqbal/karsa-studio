@@ -4,13 +4,17 @@ import { saveFile } from "../utils/upload.js";
 
 // Create Service
 export const createService = async (c: Context) => {
-  const existing = await prisma.service.findFirst();
-  if (existing) {
-    return c.json({ message: "Service already exists" }, 400);
-  }
-
   const body = await c.req.parseBody();
   let imageUrl = "";
+
+    const existing = await prisma.service.findFirst({
+    where: {
+      title: body.title as string
+    }
+  });
+  if (existing) {
+    return c.json({ success: false,message: "Service already exists" }, 400);
+  }
 
   if (body.imageUrl instanceof File) {
     imageUrl = await saveFile(body.imageUrl);
