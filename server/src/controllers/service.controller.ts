@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { prisma } from "../utils/db.js";
 import { saveFile } from "../utils/upload.js";
 
-// Create Service
+// CREATE SERVICE
 export const createService = async (c: Context) => {
   const body = await c.req.parseBody();
   let imageUrl = "";
@@ -36,3 +36,14 @@ export const createService = async (c: Context) => {
     201
   );
 };
+
+// GET SERVICE
+export const getService = async(c:Context) => {
+  const service = await prisma.service.findMany()
+
+  return c.json({
+    success: true,
+    message: "Get All Service",
+    data: service
+  })
+}
