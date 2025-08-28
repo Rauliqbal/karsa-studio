@@ -1,9 +1,12 @@
 import { prisma } from "../utils/db.js";
 import bcrypt from "bcryptjs";
 import { signToken, verifyToken } from "../utils/jwt.js";
+import type { Context } from "hono";
+import type { AdminUserInput, AdminUserResponse } from "../types/adminUser.js";
+import type { Prisma, Role } from "../generated/prisma/index.js";
 
 // REGISTER
-export const register = async (c: any) => {
+export const register = async (c: Context) => {
   const data = c.get("validatedData");
 
   const existing = await prisma.adminUser.findUnique({
@@ -29,7 +32,6 @@ export const register = async (c: any) => {
       name: data.name,
       email: data.email,
       password: hashed,
-      role: data.role,
       verified: false,
     },
   });
@@ -52,7 +54,7 @@ export const register = async (c: any) => {
 };
 
 // LOGIN
-export const login = async (c: any) => {
+export const login = async (c: Context) => {
   const data = c.get("validatedData");
 
   const user = await prisma.adminUser.findUnique({
@@ -103,8 +105,8 @@ export const login = async (c: any) => {
   );
 };
 
-// GET CURRENT USER
-export const getUser = async (c: any) => {
+// GET CURRENT ADMINUSER
+export const getUser = async (c: Context) => {
   const auth = c.get("auth");
 
   if (!auth?.id) {
@@ -130,5 +132,39 @@ export const getUser = async (c: any) => {
     success: true,
     message: "User fetched successfully",
     data: user,
+  });
+};
+
+// UPDATE ADMINUSER
+export const updateUser = async (c: Context) => {
+  const { id } = c.req.param(); 
+  const body = await c.req.json() as AdminUserInput;
+
+  const user = await prisma.adminUser.findUnique({ where: { id } });
+  if (!user) return c.json({ message: "Not Found" }, 404);
+
+  if (body.password && body.confirmPassword && body.password !== body.confirmPassword) {
+    return c.json({ message: "Password tidak sama" }, 400);
+  }
+
+  const updateData: Prisma.AdminUserUpdateInput = {};
+
+  if (body.name) updateData.name = body.name;
+  if (body.email) updateData.email = body.email;
+  if (body.password){
+    updateData.password = await bcrypt.hash(body.password,10)
+  }
+  if (body.role) updateData.role = body.role as Role;
+  if (body.verified !== undefined) updateData.verified = body.verified;
+
+  const updated = await prisma.adminUser.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return c.json({
+    success: true,
+    message: "Update Successfully",
+    data: updated,
   });
 };

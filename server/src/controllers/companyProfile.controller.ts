@@ -68,10 +68,10 @@ export const getCompanyProfile = async (c: Context) => {
 
 // Update Company Profile
 export const updateCompanyProfile = async (c: Context) => {
+  const body = (await c.req.parseBody()) as unknown as CompanyProfileInput;
+
   const profile = await prisma.companyProfile.findFirst();
   if (!profile) return c.json({ message: "Not Found" }, 404);
-
-  const body = (await c.req.parseBody()) as unknown as CompanyProfileInput;
 
   const updateData: Partial<CompanyProfileResponse> = {
     name: body.name,
