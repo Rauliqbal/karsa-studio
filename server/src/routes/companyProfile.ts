@@ -7,11 +7,11 @@ import {
 } from "../controllers/companyProfile.controller.js";
 import { authorization } from "../middlewares/authorization.js";
 
-const app = new Hono();
+const companyRoute = new Hono();
 
-app.get("/about", getCompanyProfile);
-app.post("/about", authorization, createCompanyProfile);
-app.put("/about", authorization, updateCompanyProfile);
-app.delete("/about", authorization, deleteCompanyProfile);
+companyRoute.get("/", getCompanyProfile );
+companyRoute.post("/", authorization, createCompanyProfile);
+companyRoute.put("/", authorization, updateCompanyProfile);
+companyRoute.delete("/", authorization, deleteCompanyProfile);
 
-export default app;
+export default companyRoute;

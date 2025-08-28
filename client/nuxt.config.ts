@@ -22,4 +22,10 @@ export default defineNuxtConfig({
      */
     componentDir: "./app/components/ui",
   },
+  fonts: {
+    families: [
+      { name: "Dela Gothic One", provider: "google" },
+      { name: "Archivo", provider: "google" },
+    ],
+  },
 });

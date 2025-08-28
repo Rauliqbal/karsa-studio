@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.js";
 import companyRoutes from "./routes/companyProfile.js";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { cors } from "hono/cors";
+import apiRoute from "./routes/index.js";
 
 const app = new Hono();
 
@@ -28,7 +29,7 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 app.route("/auth", authRoutes);
-app.route("/api", companyRoutes);
+app.route("/api", apiRoute);
 
 serve(
   {
