@@ -1,7 +1,8 @@
 import type { Context } from "hono";
 import { prisma } from "../utils/db.js";
 import { saveFile } from "../utils/upload.js";
-import { success } from "zod";
+import path from "path";
+import fs from "fs/promises";
 
 // CREATE SERVICE
 export const createService = async (c: Context) => {
@@ -66,5 +67,49 @@ export const getServiceId = async (c: Context) => {
     success: true,
     message: "Get Service by ID Successfully",
     data: serviceById,
+  });
+};
+
+// UPDATE SERVICE
+export const updateService = async (c: Context) => {
+  const { id } = c.req.param();
+  const body = await c.req.parseBody();
+  let imageUrl = "";
+
+  const service = await prisma.service.findFirst({
+    where: { id },
+  });
+  if (!service) {
+    return c.json({
+      success: false,
+      message: "Not Found",
+    });
+  }
+
+  const updateData: any = {};
+  if (body.title) updateData.title = body.title;
+  if (body.description) updateData.description = body.description;
+  if (body.imageUrl && body.imageUrl instanceof File) {
+    if (service.imageUrl) {
+      const oldPath = path.join(process.cwd(), "public", service.imageUrl);
+
+      try {
+        await fs.unlink(oldPath);
+      } catch (e) {
+        console.warn("failed Delete Old Image");
+      }
+    }
+    updateData.imageUrl = await saveFile(body.imageUrl);
+  }
+
+  const updated = await prisma.service.update({
+    where: { id: service.id },
+    data: updateData,
+  });
+
+  return c.json({
+    success: true,
+    message: "Update successfully",
+    data: updated,
   });
 };

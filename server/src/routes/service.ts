@@ -4,6 +4,7 @@ import {
   createService,
   getService,
   getServiceId,
+  updateService,
 } from "../controllers/service.controller.js";
 
 const serviceRoute = new Hono();
@@ -11,5 +12,6 @@ const serviceRoute = new Hono();
 serviceRoute.post("/", authorization, createService);
 serviceRoute.get("/", getService);
 serviceRoute.get("/:id", getServiceId);
+serviceRoute.put("/:id", authorization, updateService);
 
 export default serviceRoute;
