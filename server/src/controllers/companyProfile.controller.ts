@@ -90,7 +90,7 @@ export const updateCompanyProfile = async (c: Context) => {
       try {
         await fs.unlink(oldPath);
       } catch (e) {
-        console.warn("⚠️ Gagal hapus logo lama:", e);
+        console.warn("Failed Delete Old image", e);
       }
     }
     updateData.logoUrl = await saveFile(body.logoUrl);
@@ -120,6 +120,7 @@ export const updateCompanyProfile = async (c: Context) => {
   });
 };
 
+// DELETE COMPANY PROFILE
 export const deleteCompanyProfile = async (c: Context) => {
   const profile = await prisma.companyProfile.findFirst();
   if (!profile) return c.json({ message: "Not Found" }, 404);
