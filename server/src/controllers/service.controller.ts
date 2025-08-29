@@ -95,7 +95,7 @@ export const updateService = async (c: Context) => {
 
       try {
         await fs.unlink(oldPath);
-      } catch (e) {
+      } catch (error) {
         console.warn("failed Delete Old Image");
       }
     }
@@ -111,5 +111,34 @@ export const updateService = async (c: Context) => {
     success: true,
     message: "Update successfully",
     data: updated,
+  });
+};
+
+//  DELETE SERVICE
+export const deleteService = async (c: Context) => {
+  const { id } = c.req.param();
+
+  const service = await prisma.service.findFirst({ where: { id } });
+  if (!service)
+    return c.req.json({
+      success: false,
+      message: "Not Found",
+    });
+
+  if (service.imageUrl) {
+    const imageFile = path.basename(service.imageUrl);
+    const imagePath = path.join(process.cwd(), "public", "uploads", imageFile);
+    try {
+      await fs.unlink("Delete Image:", imagePath);
+    } catch (error) {
+      console.warn("Image not found:", imagePath);
+    }
+  }
+
+  await prisma.service.delete({ where: { id: service.id } });
+
+  return c.json({
+    success: true,
+    message: "Delete Successfuly",
   });
 };
