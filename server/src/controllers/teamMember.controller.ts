@@ -41,3 +41,22 @@ export const getTeamMember = async (c: Context) => {
     data: teamMember,
   });
 };
+
+export const getTeamMemberById = async (c: Context) => {
+  const { id } = c.req.param();
+
+  const teamMember = await prisma.teamMember.findFirst({
+    where: { id },
+  });
+  if (!teamMember) return c.json({ success: false, message: "Not Found" });
+
+  const teamMemberById = await prisma.teamMember.findUnique({
+    where: { id },
+  });
+
+  return c.json({
+    success: true,
+    message: "Get Member by ID Successfully",
+    data: teamMemberById,
+  });
+};
