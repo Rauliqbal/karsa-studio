@@ -41,6 +41,7 @@ export const register = async (c: Context) => {
     name: user.name,
     email: user.email,
     role: user.role,
+    verified: user.verified,
   };
 
   return c.json(
@@ -71,6 +72,12 @@ export const login = async (c: Context) => {
       },
       401
     );
+  }
+  if (!user.verified) {
+    return c.json({
+      success: false,
+      message: "Account Not Verified",
+    });
   }
 
   const valid = await bcrypt.compare(data.password, user.password);
@@ -137,13 +144,17 @@ export const getUser = async (c: Context) => {
 
 // UPDATE ADMINUSER
 export const updateUser = async (c: Context) => {
-  const { id } = c.req.param(); 
-  const body = await c.req.json() as AdminUserInput;
+  const { id } = c.req.param();
+  const body = (await c.req.json()) as AdminUserInput;
 
   const user = await prisma.adminUser.findUnique({ where: { id } });
   if (!user) return c.json({ message: "Not Found" }, 404);
 
-  if (body.password && body.confirmPassword && body.password !== body.confirmPassword) {
+  if (
+    body.password &&
+    body.confirmPassword &&
+    body.password !== body.confirmPassword
+  ) {
     return c.json({ message: "Password tidak sama" }, 400);
   }
 
@@ -151,8 +162,8 @@ export const updateUser = async (c: Context) => {
 
   if (body.name) updateData.name = body.name;
   if (body.email) updateData.email = body.email;
-  if (body.password){
-    updateData.password = await bcrypt.hash(body.password,10)
+  if (body.password) {
+    updateData.password = await bcrypt.hash(body.password, 10);
   }
   if (body.role) updateData.role = body.role as Role;
   if (body.verified !== undefined) updateData.verified = body.verified;

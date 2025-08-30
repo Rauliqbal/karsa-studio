@@ -15,4 +15,5 @@ serviceRoute.get("/", getService);
 serviceRoute.get("/:id", getServiceId);
 serviceRoute.put("/:id", authorization, updateService);
 serviceRoute.delete("/:id", authorization, deleteService);
+
 export default serviceRoute;
