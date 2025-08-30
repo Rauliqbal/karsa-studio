@@ -16,7 +16,6 @@ export const createCompanyProfile = async (c: Context) => {
   }
 
   const body = await c.req.parseBody();
-
   let logoUrl = "";
   let coverImageUrl = "";
 
@@ -131,7 +130,7 @@ export const deleteCompanyProfile = async (c: Context) => {
     try {
       await fs.unlink(logoPath);
       console.log("Deleted logo:", logoPath);
-    } catch (err) {
+    } catch (error) {
       console.warn("Logo file not found:", logoPath);
     }
   }

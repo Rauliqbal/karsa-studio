@@ -120,7 +120,7 @@ export const deleteService = async (c: Context) => {
 
   const service = await prisma.service.findFirst({ where: { id } });
   if (!service)
-    return c.req.json({
+    return c.json({
       success: false,
       message: "Not Found",
     });
@@ -129,7 +129,7 @@ export const deleteService = async (c: Context) => {
     const imageFile = path.basename(service.imageUrl);
     const imagePath = path.join(process.cwd(), "public", "uploads", imageFile);
     try {
-      await fs.unlink("Delete Image:", imagePath);
+      await fs.unlink(imagePath);
     } catch (error) {
       console.warn("Image not found:", imagePath);
     }
